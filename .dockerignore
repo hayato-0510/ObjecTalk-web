@@ -1,0 +1,41 @@
+# Node modules
+node_modules
+npm-debug.log
+
+# ビルド成果物
+dist
+build
+.vite
+
+# 環境変数（docker-compose.ymlで管理）
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# エディタ設定
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ログ
+logs
+*.log
+
+# テストカバレッジ
+coverage
+.nyc_output
+
+# その他
+README.md
+docker-compose.yml
+Dockerfile
+.dockerignore

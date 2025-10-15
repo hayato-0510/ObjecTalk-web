@@ -37,7 +37,8 @@ app.post('/api/sdp', async (req, res) => {
         const response = await axios.post(WEBRTC_URL, sdpOffer, {
             headers: {
                 "Authorization": `Bearer ${OPENAI_API_KEY}`,
-                "Content-Type": "application/sdp"
+                "Content-Type": "application/sdp",
+                "instruction": "あなたはAIで語尾に「だひょん」をつけて話します", // "alloy"、"gemini-pro"、"gemini-1.5" など、利用可能なモデルを指定
             },
             // OpenAIからSDPがテキストで返ってくることを保証
             responseType: 'text'

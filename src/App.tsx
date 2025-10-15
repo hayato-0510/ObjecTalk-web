@@ -1,9 +1,13 @@
 import { useEffect, useRef, useReducer, useCallback } from 'react';
+import ChatContainer from './components/ChatContainer';
+import LogContainer from './components/LogContainer';
+import ControlPanel from './components/ControlPanel';
+import EventCounterPanel from './components/EventCounterPanel';
 
 // --- 型定義 ---
 type SessionStatus = 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED' | 'ERROR';
 
-interface ChatItem {
+export interface ChatItem {
   id: string;
   text: string;
   role: 'ai';
@@ -231,6 +235,10 @@ const App = () => {
     }
   };
 
+  const handleClearEvents = () => {
+    dispatch({ type: 'CLEAR_EVENTS' });
+  };
+
   // --- Component Rendering ---
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', margin: '12px' }}>
@@ -281,85 +289,19 @@ const App = () => {
         }
       `}</style>
 
-      {/* コントロールボタン */}
-      <div style={{ marginBottom: '12px' }}>
-        <button
-          onClick={startSession}
-          disabled={state.status === 'CONNECTING' || state.status === 'CONNECTED'}
-          style={{ marginRight: '8px', padding: '8px 16px', borderRadius: '4px', backgroundColor: state.status === 'CONNECTED' ? '#ccc' : '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}
-        >
-          {state.status === 'CONNECTING' ? '接続中...' : 'セッション開始'}
-        </button>
-        <button
-          onClick={stopSession}
-          disabled={state.status !== 'CONNECTED'}
-          style={{ marginRight: '8px', padding: '8px 16px', borderRadius: '4px', backgroundColor: state.status !== 'CONNECTED' ? '#ccc' : '#f44336', color: 'white', border: 'none', cursor: 'pointer' }}
-        >
-          セッション停止
-        </button>
-        <button
-          onClick={() => dispatch({ type: 'CLEAR_EVENTS' })}
-          style={{ padding: '8px 16px', borderRadius: '4px', backgroundColor: '#2196F3', color: 'white', border: 'none', cursor: 'pointer' }}
-        >
-          イベントカウントをクリア
-        </button>
-      </div>
+      <ControlPanel
+        status={state.status}
+        onStart={startSession}
+        onStop={stopSession}
+        onClearEvents={handleClearEvents}
+      />
 
-      {/* 簡易ログ */}
-      <div className="log-container">
-        {state.log.map((msg: string, index: number) => (
-          <p key={index} style={{ margin: '4px 0', color: state.status === 'ERROR' && msg.includes('エラー') ? 'red' : 'inherit' }}>
-            {msg}
-          </p>
-        ))}
-      </div>
+      <LogContainer log={state.log} status={state.status} />
 
       <h2>会話</h2>
-      {/* 会話表示エリア */}
-      <div id="chatContainer" ref={chatContainerRef}>
-        {state.chatHistory.length === 0 && (
-          <p style={{ fontStyle: 'italic', color: '#666' }}>「セッション開始」ボタンを押して、マイクに向かって話しかけてください。</p>
-        )}
-        {state.chatHistory.map((item: ChatItem) => (
-          <p key={item.id} className="chat-message ai">
-            {item.text}
-          </p>
-        ))}
-      </div>
+      <ChatContainer chatHistory={state.chatHistory} chatContainerRef={chatContainerRef} />
 
-      {/* 受信イベントをカウントして表示するパネル */}
       <EventCounterPanel eventCounts={state.eventCounts} />
-    </div>
-  );
-};
-
-// --- イベントカウンターコンポーネント ---
-interface EventCounterPanelProps {
-  eventCounts: Map<string, number>;
-}
-
-const EventCounterPanel = ({ eventCounts }: EventCounterPanelProps) => {
-  const sortedEntries = Array.from(eventCounts.entries()).sort((a, b) => b[1] - a[1]);
-
-  return (
-    <div id="eventPanel" aria-live="polite" title="受信イベントの種類と回数">
-      <h3>受信イベント（回数）</h3>
-      <table id="eventTable">
-        <tbody>
-          {sortedEntries.length === 0 ? (
-            <tr>
-              <td colSpan={2} style={{ fontStyle: 'italic', color: '#666' }}>まだイベントが受信されていません。</td>
-            </tr>
-          ) : (
-            sortedEntries.map(([name, count]) => (
-              <tr key={name}>
-                <td className="name">{name}</td>
-                <td className="count">{String(count)}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
     </div>
   );
 };
