@@ -3,7 +3,7 @@ import { useEffect, useRef, useReducer, useCallback } from 'react';
 // --- 型定義 ---
 type SessionStatus = 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED' | 'ERROR';
 
-interface ChatItem {
+export interface ChatItem {
   id: string;
   text: string;
   role: 'ai';
@@ -162,9 +162,28 @@ const App = () => {
       const dc = pc.createDataChannel("oai-events");
       dcRef.current = dc;
 
-      dc.onopen = () => {
+      dc.onopen = async () => {
         log("✅ データチャネルが開きました。セッション開始。");
         dispatch({ type: 'SET_STATUS', payload: 'CONNECTED' });
+        
+        // システムプロンプトをバックエンドから取得して送信
+        try {
+          const configResponse = await fetch(`${BACKEND_URL.replace('/api/sdp', '/api/config')}`);
+          const config = await configResponse.json();
+          
+          if (config.systemPrompt) {
+            const sessionUpdate = {
+              type: 'session.update',
+              session: {
+                instructions: config.systemPrompt
+              }
+            };
+            dc.send(JSON.stringify(sessionUpdate));
+            log(`💬 システムプロンプトを設定しました`);
+          }
+        } catch (err) {
+          console.error('Failed to load system prompt:', err);
+        }
       };
 
       dc.onclose = () => {
