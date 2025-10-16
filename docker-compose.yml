@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # フロントエンド開発サーバー (Vite)
+  frontend:
+    build: .
+    container_name: objectalk-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
+    networks:
+      - objectalk-network
+
+  # バックエンドサーバー (Express)
+  backend:
+    build: .
+    container_name: objectalk-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm start
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+    depends_on:
+      - frontend
+    networks:
+      - objectalk-network
+
+networks:
+  objectalk-network:
+    driver: bridge
