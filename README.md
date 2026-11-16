@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# ObjecTalk（Web版）
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+モノと音声で話せるアプリ「ObjecTalk」のWeb版です。
+モノに人格（ロール）を持たせて、OpenAI Realtime API でリアルタイムに音声会話ができます。
+Unity版（本体）のほかに、ブラウザで動く形でも制作しました。
 
-Currently, two official plugins are available:
+## 機能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- WebRTC で OpenAI Realtime API に接続し、音声で会話する
+- キーワードから、モノの人格（ロールプロンプト）を自動生成する
+- 音声の種類やシステムプロンプトを設定で切り替えられる
+- 物体検出まわりの設定コード（`src/ObjectDetection/`）を含む
 
-## React Compiler
+## 構成
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| 部分 | 役割 |
+| :--- | :--- |
+| フロントエンド（`src/`） | React + TypeScript + Vite。WebRTC の接続と会話UI |
+| バックエンド（`src/backend/`） | Express。SDP の中継を行い、OpenAI の API キーをクライアントに渡さない |
 
-## Expanding the ESLint configuration
+## 使用技術
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 19 / TypeScript / Vite
+- Express（バックエンド）
+- OpenAI Realtime API（WebRTC）
+- OpenAI Chat Completions API（ロールプロンプトの生成）
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 動かし方
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+プロジェクト直下に `.env` を作り、OpenAI の API キーを設定します。
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+OPENAI_API_KEY=...
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+バックエンドとフロントエンドを、それぞれ別のターミナルで起動します。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run start   # バックエンド（ポート3001）
+npm run dev     # フロントエンド（Vite）
 ```
+
+## 関連ドキュメント
+
+- [AI-CONFIG-GUIDE.md](AI-CONFIG-GUIDE.md) — AI の設定
+- [VOICE-SETTINGS.md](VOICE-SETTINGS.md) — 音声の設定
+- [SYSTEM-PROMPT-GUIDE.md](SYSTEM-PROMPT-GUIDE.md) — システムプロンプトの設定
+- [README.docker.md](README.docker.md) — Docker での実行
