@@ -4,6 +4,12 @@
 モノに人格（ロール）を持たせて、OpenAI Realtime API でリアルタイムに音声会話ができます。
 Unity版（本体）のほかに、ブラウザで動く形でも制作しました。
 
+## 画面
+
+<img src="docs/images/screen-top.png" width="720" alt="ObjecTalk Web版のメイン画面">
+
+「セッション開始」を押してマイクに話しかけると、モノの人格と音声で会話できます。
+
 ## 機能
 
 - WebRTC で OpenAI Realtime API に接続し、音声で会話する
